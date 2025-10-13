@@ -892,11 +892,6 @@ td.lafadz-col {
   display: none !important;
 }
 
-
-.btn-edit {
-  display: none !important;
-}
-
 /* ==========================
    KOLOM LAFADZ NADHOM - 2 BARIS DENGAN GARIS
 ========================== */
@@ -1063,6 +1058,7 @@ select.arabic option {
     font-size: 0.95em !important;
   }
 }
+
 
 
 

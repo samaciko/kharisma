@@ -918,7 +918,8 @@ const KITAB_NADHOM = [
   "الفية (الثاني)",   // Alfiyah II  
   "العمرطي",       // Imrithi
   "جوهر المكنون",    // Jauharul Maknun
-  "القواعد الصرفية",	//Qowaidus sorfiyah
+  "(١) القواعد الصرفية",	//Qowaidus sorfiyah
+  "(٢) القواعد الصرفية",
   "تنوير الحجى"    // Tanwirul Hija
 ];
 
@@ -1034,3 +1035,4 @@ if ("serviceWorker" in navigator) {
       .catch((err) => console.log("❌ SW registration failed:", err));
   });
 }
+

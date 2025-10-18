@@ -1433,7 +1433,6 @@ table tbody tr:hover {
 .laporan-table td {
   border: 1px solid #1a73e8;
   padding: 8px 6px;
-  text-align: center;
 }
 
 .laporan-table th {
@@ -1444,3 +1443,4 @@ table tbody tr:hover {
 .laporan-container {
   overflow-x: auto; /* supaya tabel tidak terpotong di HP */
 }
+

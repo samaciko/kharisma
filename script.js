@@ -165,6 +165,8 @@ form.addEventListener("submit", async (e) => {
     const sampai = sampaiSelect.value || null;
     const keterangan = document.getElementById("keterangan").value.trim();
     const penyimak = document.getElementById("penyimak").value;
+	const statusLancar = document.querySelector('input[name="status_lancar"]:checked')?.value || null;
+
 
     // Validasi input dasar
     if (!stambuk || !kitab || !dari || !sampai) {
@@ -184,6 +186,7 @@ form.addEventListener("submit", async (e) => {
       sampai_ayat: sampai,
       total_ayat: total,
       id_penyimak: penyimak,
+	  status_lancar: statusLancar,
       keterangan,
       tanggal: new Date().toISOString().split("T")[0],
     };
@@ -196,11 +199,15 @@ form.addEventListener("submit", async (e) => {
     const selectedPenyimak = document.getElementById("penyimak").value;
     const selectedKitab = kitabSelect.value;
 
-    // Reset hanya field tertentu (bukan semua form)
-    namaSelect.innerHTML = `<option value="">Pilih Santri</option>`;
-    dariSelect.innerHTML = `<option value="">Pilih Bait</option>`;
-    sampaiSelect.innerHTML = `<option value="">Pilih Bait</option>`;
-    document.getElementById("keterangan").value = "";
+    // ✅ Reset hanya field tertentu (bukan semua form)
+	namaSelect.innerHTML = `<option value="">Pilih Santri</option>`;
+	dariSelect.innerHTML = `<option value="">Pilih Bait</option>`;
+	sampaiSelect.innerHTML = `<option value="">Pilih Bait</option>`;
+	document.getElementById("keterangan").value = "";
+
+	// ✅ Reset radio status lancar
+	document.querySelectorAll('input[name="status_lancar"]').forEach(r => r.checked = false);
+
 
     // ✅ Kembalikan pilihan unit, penyimak, dan kitab sebelumnya
     unitSelect.value = selectedUnit;
@@ -235,7 +242,7 @@ async function loadData() {
   const { data, error } = await client
   .from("setoran_nadhom")
     .select(`
-    id, tanggal, total_ayat, keterangan,
+    id, tanggal, total_ayat, keterangan,status_lancar,
     created_at, updated_at,
     id_penyimak,
     santri_kharisma (Nama_Lengkap, Kelas, Unit_Ndalem),
@@ -351,6 +358,7 @@ function renderTable(unitName, rows) {
               <th>Total</th>
               <th>Tanggal</th>
               <th>Penyimak</th>
+			  <th>Status</th>
               <th>Ket</th>
               <th>Aksi</th>
             </tr>
@@ -407,6 +415,7 @@ function renderTable(unitName, rows) {
         <td>${totalKeseluruhan}${showStar ? " *" : ""}</td>
         <td>${waktuRapi}</td>
         <td>${r.nama_penyimak || "-"}</td>
+		<td>${r.status_lancar || '-'}</td>
         <td>${r.keterangan || "-"}</td>
         <td>
           <button class="btn-edit" onclick="openEditPopup('${r.id}')">✏️</button>
@@ -428,8 +437,8 @@ function renderTable(unitName, rows) {
  // ===============================
 //  URUTAN KHUSUS KELAS
 // ===============================
-const kelasOrder = [
-  "SP",
+const kelasOrder = [ 
+  "IV Ibtidaiyah",
   "V Ibtidaiyah",
   "VI Ibtidaiyah",
   "I Tsanawiyah",
@@ -440,7 +449,10 @@ const kelasOrder = [
   "III Aliyah",
   "I-II Ma'had Aly",
   "III-IV Ma'had Aly",
-  "V-VI Ma'had Aly"
+  "V-VI Ma'had Aly",
+  "I'dadiyah I",
+  "I'dadiyah II",
+  "I'dadiyah III"
 ];
 
 
@@ -644,7 +656,7 @@ window.openEditPopup = async function (id) {
   const { data, error } = await client
     .from("setoran_nadhom")
     .select(`
-      id, id_kitab, tanggal, total_ayat, keterangan,
+      id, id_kitab, tanggal, total_ayat, keterangan,status_lancar,
       created_at, updated_at,
       id_penyimak,
       santri_kharisma (Nama_Lengkap, Kelas, Unit_Ndalem),
@@ -664,6 +676,15 @@ window.openEditPopup = async function (id) {
   document.getElementById("editNama").value = data.santri_kharisma?.Nama_Lengkap || "";
   document.getElementById("editKelas").value = data.santri_kharisma?.Kelas || "";
   document.getElementById("editKeterangan").value = data.keterangan || "";
+// ✅ Versi fleksibel & tahan huruf besar kecil
+document.querySelectorAll('input[name="edit_status_lancar"]').forEach(radio => {
+  radio.checked = (
+    (data.status_lancar || '').toLowerCase() === radio.value.toLowerCase()
+  );
+});
+
+
+  
 
   await loadPenyimakToEdit(data.id_penyimak);
   await loadKitabToEdit(data.id_kitab, data.dari_bait?.nomor_bait, data.sampai_bait?.nomor_bait);
@@ -751,6 +772,8 @@ document.getElementById("editForm").addEventListener("submit", async (e) => {
     const sampaiVal = document.getElementById("editSampaiAyat").value;
     const penyimak = document.getElementById("editPenyimak").value;
     const keterangan = document.getElementById("editKeterangan").value.trim();
+	const statusLancar = document.querySelector('input[name="edit_status_lancar"]:checked')?.value || null;
+
 
     // ✅ Validasi dasar
     if (!id || !kitabVal || !dariVal || !sampaiVal) {
@@ -790,6 +813,7 @@ document.getElementById("editForm").addEventListener("submit", async (e) => {
       sampai_ayat: sampai,
       total_ayat: total,
       id_penyimak: penyimak || null,
+	  status_lancar: statusLancar,
       keterangan,
       updated_at: new Date().toISOString(),
     };
@@ -1071,6 +1095,654 @@ function renderLafadz(teksArab, judulKitab) {
 
 }
 
+// ==================== TAB NAVIGATION ====================
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".tab-btn");
+  if (!btn) return;
+
+  // hapus class aktif dari semua tombol
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+
+  // sembunyikan semua tab, tampilkan tab yang dipilih
+  const tabId = btn.getAttribute("data-tab");
+  document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+});
+
+
+// ==================== LAPORAN SOROGAN ====================
+
+// urutan kelas tetap
+const kelasOrder = [
+  'VI Ibtidaiyah', 'V Ibtidaiyah', 'VI Ibtidaiyah',
+  'I Tsanawiyah', 'II Tsanawiyah', 'III Tsanawiyah',
+  'I Aliyah', 'II Aliyah', 'III Aliyah',
+  "I-II Ma'had Aly", "III-IV Ma'had Aly", "V-VI Ma'had Aly", "I'dadiyah I", "I'dadiyah II", "I'dadiyah III"
+];
+
+// ambil daftar kelas, unit, kitab
+async function loadChecklistFilters() {
+  const [santriRes, kitabRes] = await Promise.all([
+    client
+      .from("santri_kharisma")
+      .select("Kelas, Unit_Ndalem, Status")
+      .eq("Status", "aktif") // ✅ hanya santri aktif
+      .not("Kelas", "is", null)
+      .not("Unit_Ndalem", "is", null),
+    client.from("nadhom_kitab").select("nama_kitab, jenis_setoran")
+  ]);
+
+  if (santriRes.error) console.error("Gagal ambil kelas/unit:", santriRes.error);
+  if (kitabRes.error) console.error("Gagal ambil kitab:", kitabRes.error);
+
+  const data = santriRes.data || [];
+  const kelasUnik = [...new Set(data.map(d => d.Kelas))].sort((a, b) => kelasOrder.indexOf(a) - kelasOrder.indexOf(b));
+  const unitUnik = [...new Set(data.map(d => d.Unit_Ndalem))].sort();
+
+  // hanya kitab wajib untuk checklist utama
+  const kitabUnik = [...new Set((kitabRes.data || [])
+    .filter(k => k.jenis_setoran === "Wajib")
+    .map(k => k.nama_kitab))].sort();
+
+  renderChecklist("kelasChecklist", kelasUnik, "kelas");
+  renderChecklist("unitChecklist", unitUnik, "unit");
+  renderChecklist("kitabChecklist", kitabUnik, "kitab");
+  
+  // refresh counts dan attach collapse listeners (jika belum)
+  updateChecklistCounts();
+  initChecklistCollapsibles(); // aman dipanggil ulang
+}
+
+function renderChecklist(containerId, items, type) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = items.map(i => `
+    <label class="check-item">
+      <input type="checkbox" value="${i}" data-type="${type}"> ${i}
+    </label>
+  `).join("");
+}
+
+// ===================== CHECKLIST COLLAPSIBLE =====================
+
+// Jalankan ulang event listener setelah checklist dirender
+function initChecklistCollapsibles() {
+  document.querySelectorAll('.checklist-header').forEach(header => {
+    // Hapus event lama supaya tidak dobel
+    header.replaceWith(header.cloneNode(true));
+  });
+
+  // Ambil ulang semua header setelah clone
+  document.querySelectorAll('.checklist-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const targetId = header.getAttribute('data-target');
+      const body = document.getElementById(targetId);
+      const tri = header.querySelector('.triangle');
+      if (!body) return;
+
+      const collapsed = body.classList.contains('collapsed');
+      if (collapsed) {
+        body.classList.remove('collapsed');
+        body.classList.add('expanded');
+        tri.classList.add('open');
+      } else {
+        body.classList.remove('expanded');
+        body.classList.add('collapsed');
+        tri.classList.remove('open');
+      }
+    });
+  });
+
+  // Set default tertutup
+  document.querySelectorAll('.checklist-body').forEach(body => {
+    if (!body.classList.contains('expanded')) {
+      body.classList.add('collapsed');
+    }
+  });
+  document.querySelectorAll('.triangle').forEach(tri => tri.classList.remove('open'));
+}
+
+// Hitung jumlah checklist
+function updateChecklistCounts() {
+  const cnt = id => document.querySelectorAll(`#${id} .check-item`).length;
+  const setText = (id, n) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = n ? `${n}` : '';
+  };
+  setText('kelasCount', cnt('kelasChecklist'));
+  setText('unitCount', cnt('unitChecklist'));
+  setText('kitabCount', cnt('kitabChecklist'));
+}
+
+// Pastikan inisialisasi dilakukan setelah halaman siap
+document.addEventListener('DOMContentLoaded', () => {
+  // inisialisasi pertama
+  initChecklistCollapsibles();
+});
+
+
+// ===================== FILTER SEKOLAH PAGI / MALAM =====================
+
+// daftar kelas per kategori
+const kelasPagi = [
+  'IV Ibtidaiyah', 'V Ibtidaiyah', 'VI Ibtidaiyah',
+  'I Tsanawiyah', 'II Tsanawiyah', "I'dadiyah I", "I'dadiyah II"
+];
+const kelasMalam = [
+  'III Tsanawiyah',
+  'I Aliyah', 'II Aliyah', 'III Aliyah',
+  "I-II Ma'had Aly", "III-IV Ma'had Aly", "V-VI Ma'had Aly", "I'dadiyah III"
+];
+
+// fungsi memperbarui checklist kelas sesuai shift
+function updateKelasByShift(shift) {
+  let targetKelas = [];
+  if (shift === 'pagi') targetKelas = kelasPagi;
+  else if (shift === 'malam') targetKelas = kelasMalam;
+  else targetKelas = [...kelasPagi, ...kelasMalam]; // kalau nanti ada opsi "semua sekolah"
+
+  // render daftar kelas
+  renderChecklist('kelasChecklist', targetKelas, 'kelas');
+
+  // ✅ otomatis centang semua kelas setelah tampil
+  setTimeout(() => {
+    document.querySelectorAll('#kelasChecklist input[type="checkbox"]').forEach(cb => cb.checked = true);
+    loadLaporan(); // langsung refresh laporan setelah semua kelas tercentang
+  }, 50);
+}
+
+// ===================== EVENT LISTENER RADIO SHIFT =====================
+document.addEventListener('change', e => {
+  if (e.target.name === 'shift') {
+    updateKelasByShift(e.target.value);
+    loadLaporan(); // ✅ langsung refresh laporan setelah ganti shift
+  }
+});
+
+// ===================== INISIALISASI AWAL =====================
+// saat halaman pertama kali dimuat, tampilkan semua sekolah & centang semua kelas
+document.addEventListener("DOMContentLoaded", () => {
+  const defaultShift = 'semua'; // ✅ default awal: semua sekolah
+  const defaultRadio = document.querySelector(`input[name="shift"][value="${defaultShift}"]`);
+  if (defaultRadio) defaultRadio.checked = true;
+  updateKelasByShift(defaultShift); // tampilkan semua kelas pagi + malam
+});
+
+
+async function loadLaporan() {
+  try {
+    const kelasDipilih = [...document.querySelectorAll('#kelasChecklist input:checked')].map(i => i.value);
+    const unitDipilih  = [...document.querySelectorAll('#unitChecklist input:checked')].map(i => i.value);
+    const kitabDipilih = [...document.querySelectorAll('#kitabChecklist input:checked')].map(i => i.value);
+
+    // Ambil data dari dua view:
+    // - statusData: view per santri (unik, untuk prosentase)
+    // - detailData: view per kitab (untuk tabel detail)
+    const { data: statusData = [], error: statusErr } = await client.from("v_status_khatam_lancar_santri").select("*");
+    const { data: detailData = [], error: detailErr } = await client.from("v_status_khatam_lancar").select("*");
+    const { data: belumData = [], error: belumErr } = await client.from("v_belum_setoran").select("*");
+
+    if (statusErr || detailErr || belumErr) {
+      console.error("Error ambil data view:", statusErr, detailErr, belumErr);
+      return;
+    }
+
+    // ==================== FILTER DATA ====================
+    const filterLogic = (item) => {
+      const matchKelas = kelasDipilih.length ? kelasDipilih.includes(item.Kelas) : true;
+      const matchUnit  = unitDipilih.length  ? unitDipilih.includes(item.Unit_Ndalem) : true;
+      return matchKelas && matchUnit;
+    };
+
+    const filterLogicDetail = (item) => {
+      const matchKelas = kelasDipilih.length ? kelasDipilih.includes(item.Kelas) : true;
+      const matchUnit  = unitDipilih.length  ? unitDipilih.includes(item.Unit_Ndalem) : true;
+      const matchKitab = kitabDipilih.length ? kitabDipilih.includes(item.nama_kitab) : true;
+      return matchKelas && matchUnit && matchKitab;
+    };
+
+    const filteredStatus = (statusData || []).filter(filterLogic);
+    const filteredDetail = (detailData || []).filter(filterLogicDetail);
+    const filteredBelum  = (belumData  || []).filter(filterLogic);
+
+    // ==================== TOTAL GLOBAL ====================
+    const totalSantri   = filteredStatus.length;
+    const sudahKhatam   = filteredStatus.filter(s => s.status_khatam === 'Khatam').length;
+    const sudahLancar   = filteredStatus.filter(s => s.status_lancar === 'Lancar').length;
+
+    const persenKhatamGlobal = totalSantri ? ((sudahKhatam / totalSantri) * 100).toFixed(1) : 0;
+    const persenLancarGlobal = totalSantri ? ((sudahLancar / totalSantri) * 100).toFixed(1) : 0;
+
+    const summary = document.getElementById("laporanSummary");
+    if (summary) {
+      summary.innerHTML = `
+        📊 <b>Total Santri Aktif:</b> ${totalSantri} |
+        <b>Khatam:</b> ${persenKhatamGlobal}% |
+        <b>Lancar:</b> ${persenLancarGlobal}%
+      `;
+    }
+
+    // ==================== REKAP PER KELAS ====================
+    const mapKelas = {};
+    filteredStatus.forEach(s => {
+      if (!mapKelas[s.Kelas]) {
+        mapKelas[s.Kelas] = { Kelas: s.Kelas, total: 0, belumKhatam: 0, belumLancar: 0 };
+      }
+      mapKelas[s.Kelas].total++;
+      if (s.status_khatam !== 'Khatam') mapKelas[s.Kelas].belumKhatam++;
+      if (s.status_lancar !== 'Lancar') mapKelas[s.Kelas].belumLancar++;
+    });
+
+    const kelas = Object.values(mapKelas)
+      .map((k, i) => {
+        const pKhatam = ((1 - k.belumKhatam / k.total) * 100).toFixed(1);
+        const pLancar = ((1 - k.belumLancar / k.total) * 100).toFixed(1);
+        return {
+          No: i + 1,
+          Kelas: k.Kelas,
+          total_santri: k.total,
+          belum_khatam: k.belumKhatam,
+          belum_lancar: k.belumLancar,
+          persen_khatam: `${pKhatam}%`,
+          persen_lancar: `${pLancar}%`
+        };
+      })
+      .sort((a, b) => kelasOrder.indexOf(a.Kelas) - kelasOrder.indexOf(b.Kelas));
+
+    // ==================== REKAP PER UNIT ====================
+    const mapUnit = {};
+    filteredStatus.forEach(s => {
+      if (!mapUnit[s.Unit_Ndalem]) {
+        mapUnit[s.Unit_Ndalem] = { Unit_Ndalem: s.Unit_Ndalem, total: 0, belumKhatam: 0, belumLancar: 0 };
+      }
+      mapUnit[s.Unit_Ndalem].total++;
+      if (s.status_khatam !== 'Khatam') mapUnit[s.Unit_Ndalem].belumKhatam++;
+      if (s.status_lancar !== 'Lancar') mapUnit[s.Unit_Ndalem].belumLancar++;
+    });
+
+    const unit = Object.values(mapUnit)
+      .map((u, i) => {
+        const pKhatam = ((1 - u.belumKhatam / u.total) * 100).toFixed(1);
+        const pLancar = ((1 - u.belumLancar / u.total) * 100).toFixed(1);
+        return {
+          No: i + 1,
+          Unit_Ndalem: u.Unit_Ndalem,
+          total_santri: u.total,
+          belum_khatam: u.belumKhatam,
+          belum_lancar: u.belumLancar,
+          persen_khatam: `${pKhatam}%`,
+          persen_lancar: `${pLancar}%`
+        };
+      })
+      .sort((a, b) => a.Unit_Ndalem.localeCompare(b.Unit_Ndalem));
+
+    // ==================== URUTKAN DETAIL: Khatam & Lancar dulu ====================
+    filteredDetail.sort((a, b) => {
+      const score = s =>
+        (s.status_khatam === 'Khatam' ? 1 : 0) +
+        (s.status_lancar === 'Lancar' ? 1 : 0);
+      return score(b) - score(a) || a.Nama_Lengkap.localeCompare(b.Nama_Lengkap);
+    });
+
+    // ==================== RENDER TABEL ====================
+    renderTable("tblKelas", kelas, ["No", "Kelas", "total_santri", "belum_khatam", "belum_lancar", "persen_khatam", "persen_lancar"]);
+    renderTable("tblUnit",  unit,  ["No", "Unit_Ndalem", "total_santri", "belum_khatam", "belum_lancar", "persen_khatam", "persen_lancar"]);
+    renderTable("tblStatus", filteredDetail, ["No", "Nama_Lengkap", "Kelas", "Unit_Ndalem", "nama_kitab", "total_ayat_setor", "batas_khatam", "status_khatam", "status_lancar"]);
+    renderTable("tblBelum",  filteredBelum,  ["No", "Nama_Lengkap", "Kelas", "Unit_Ndalem"]);
+
+  } catch (err) {
+    console.error("Gagal load laporan:", err);
+  }
+}
+
+
+
+function renderTable(id, data, cols) {
+  const tbody = document.querySelector(`#${id} tbody`);
+  if (!tbody) return;
+
+  tbody.innerHTML = data && data.length
+    ? data.map((r, idx) => {
+        r.No = idx + 1;
+        return `<tr>${cols.map(c => `<td>${r[c] ?? ''}</td>`).join('')}</tr>`;
+      }).join('')
+    : `<tr><td colspan="${cols.length}" style="text-align:center;">(tidak ada data)</td></tr>`;
+}
+
+
+// saat tab laporan diklik
+document.querySelector('[data-tab="laporanTab"]').addEventListener("click", async () => {
+  await loadChecklistFilters();
+  await loadLaporan();
+});
+
+// update laporan setiap checklist berubah
+document.addEventListener("change", e => {
+  if (e.target.matches('#kelasChecklist input, #unitChecklist input, #kitabChecklist input')) {
+    loadLaporan();
+  }
+});
+
+// ========================== FINAL VERSION: DOWNLOAD PDF RAPi & BIRU ==========================
+async function downloadPDFAll() {
+  const btn = document.getElementById('btnDownloadAll') || document.querySelector('.btn-download-all');
+  if (btn) {
+    btn.classList.add('downloading');
+    btn.setAttribute('aria-disabled', 'true');
+  }
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const marginX = 36;
+    const doc = new jsPDF({ unit: "pt", format: "a4", compress: true });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const tables = [
+      { id: "tblKelas", title: "Rekap Prosentase Kelas" },
+      { id: "tblUnit", title: "Rekap Prosentase Unit Ndalem" },
+      { id: "tblStatus", title: "Status Khatam & Lancar (Santri)" },
+      { id: "tblBelum", title: "Santri Belum Setoran" }
+    ];
+
+    let cursorY = 25;
+
+    // ===== HEADER DOKUMEN =====
+    try {
+      const logoUrl = "https://i.imgur.com/Irgu32G.png";
+      const resp = await fetch(logoUrl);
+      if (resp.ok) {
+        const blob = await resp.blob();
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+        doc.addImage(base64, "PNG", marginX, 12, 34, 34);
+      }
+    } catch (e) {
+      console.warn("Logo gagal dimuat:", e);
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text("KHUDAMA' KHARISMA", pageWidth / 2, 30, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Pondok Pesantren Lirboyo Kota Kediri Jawa Timur", pageWidth / 2, 44, { align: "center" });
+
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9);
+    doc.text("Sekretariat: Kantor KHARISMA Gedung Nafis Lt. 02 Lirboyo Kota Kediri", pageWidth / 2, 56, { align: "center" });
+
+    doc.setLineWidth(0.7);
+    doc.line(marginX, 64, pageWidth - marginX, 64);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("LAPORAN SETORAN NADHOM", pageWidth / 2, 82, { align: "center" });
+
+    // beri jarak cukup antar header dan isi
+    cursorY = 130;
+	
+	// ===== CETAK FILTER: Sekolah / Unit / Kitab (otomatis tampil hanya jika dipilih) =====
+	// ===== CETAK FILTER: Sekolah / Unit / Kitab (kelas mengikuti sekolah) =====
+	let filterPrinted = false;
+
+	// === SEKOLAH + KELAS ===
+	const sekolahRadio = document.querySelector('#shiftFilter input[type="radio"]:checked');
+	const kelasCeklis = document.querySelectorAll('#kelasChecklist input[type="checkbox"]:checked');
+
+	if (sekolahRadio) {
+	  const sekolahUtama = sekolahRadio.closest("label")?.innerText.trim() || sekolahRadio.value;
+	  const kelasList = Array.from(kelasCeklis)
+		.map(el => el.closest("label")?.innerText.trim())
+		.filter(Boolean);
+
+	  let sekolahText = sekolahUtama;
+	  if (kelasList.length > 0) {
+		sekolahText += ` (${kelasList.join(", ")})`;
+	  }
+
+	  // Tulis ke PDF
+	  doc.setFont("helvetica", "bold");
+	  doc.setFontSize(10);
+	  doc.setTextColor(26, 115, 232);
+	  doc.text("Sekolah:", marginX, cursorY);
+
+	  doc.setFont("helvetica", "normal");
+	  doc.setFontSize(9.5);
+	  doc.setTextColor(0, 0, 0);
+	  const lines = doc.splitTextToSize(sekolahText, pageWidth - marginX * 2 - 70);
+	  doc.text(lines, marginX + 50, cursorY);
+	  cursorY += lines.length * 10 + 4;
+
+	  filterPrinted = true;
+	}
+
+	// === UNIT ===
+	const unitChecked = document.querySelectorAll('#unitChecklist input[type="checkbox"]:checked');
+	if (unitChecked.length > 0) {
+	  const unitList = Array.from(unitChecked)
+		.map(el => el.closest("label")?.innerText.trim())
+		.filter(Boolean);
+
+	  doc.setFont("helvetica", "bold");
+	  doc.setFontSize(10);
+	  doc.setTextColor(26, 115, 232);
+	  doc.text("Unit:", marginX, cursorY);
+
+	  doc.setFont("helvetica", "normal");
+	  doc.setFontSize(9.5);
+	  doc.setTextColor(0, 0, 0);
+	  const unitLines = doc.splitTextToSize(unitList.join(", "), pageWidth - marginX * 2 - 70);
+	  doc.text(unitLines, marginX + 50, cursorY);
+	  cursorY += unitLines.length * 10 + 4;
+
+	  filterPrinted = true;
+	}
+
+	// === KITAB ===
+	const kitabChecked = document.querySelectorAll('#kitabChecklist input[type="checkbox"]:checked');
+	if (kitabChecked.length > 0) {
+	  const kitabList = Array.from(kitabChecked)
+		.map(el => el.closest("label")?.innerText.trim())
+		.filter(Boolean);
+
+	  doc.setFont("helvetica", "bold");
+	  doc.setFontSize(10);
+	  doc.setTextColor(26, 115, 232);
+	  doc.text("Kitab:", marginX, cursorY);
+
+	  doc.setFont("helvetica", "normal");
+	  doc.setFontSize(9.5);
+	  doc.setTextColor(0, 0, 0);
+	  const kitabLines = doc.splitTextToSize(kitabList.join(", "), pageWidth - marginX * 2 - 70);
+	  doc.text(kitabLines, marginX + 50, cursorY);
+	  cursorY += kitabLines.length * 10 + 4;
+
+	  filterPrinted = true;
+	}
+
+	if (filterPrinted) cursorY += 6;
+
+	// ===== CETAK SUMMARY MODERN TANPA BULATAN (ikon + teks center) =====
+	const summaryEl = document.getElementById("laporanSummary");
+	if (summaryEl) {
+	  const summaryText = summaryEl.innerText.replace("📊", "").trim();
+
+	  const boxWidth = pageWidth - marginX * 2;
+	  const boxHeight = 45;
+	  const boxY = cursorY + 4;
+
+	  // === Gradient background biru lembut ===
+	  const gradientSteps = 20;
+	  for (let i = 0; i < gradientSteps; i++) {
+		const ratio = i / gradientSteps;
+		const r = 230 + (255 - 230) * ratio;
+		const g = 240 + (255 - 240) * ratio;
+		const b = 255;
+		doc.setFillColor(r, g, b);
+		doc.rect(marginX, boxY + (i * (boxHeight / gradientSteps)), boxWidth, boxHeight / gradientSteps, 'F');
+	  }
+
+	  // === Warna otomatis hijau jika 100% ===
+	  const isFullKhatam = summaryText.includes("100%");
+	  const accentColor = isFullKhatam ? [56, 142, 60] : [26, 115, 232];
+
+	  // === Muat ikon gambar ===
+	  let iconWidth = 26, iconHeight = 26;
+	  let iconBase64 = null;
+	  try {
+		const iconUrl = "https://i.imgur.com/huVGgA2.png"; // ikon statistik biru/putih
+		const resp = await fetch(iconUrl);
+		if (resp.ok) {
+		  const blob = await resp.blob();
+		  iconBase64 = await new Promise((resolve) => {
+			const reader = new FileReader();
+			reader.onloadend = () => resolve(reader.result);
+			reader.readAsDataURL(blob);
+		  });
+		}
+	  } catch (e) {
+		console.warn("Ikon summary gagal dimuat:", e);
+	  }
+
+	  // === Hitung posisi agar ikon + teks sejajar tengah ===
+	  const summaryWrap = doc.splitTextToSize(summaryText, boxWidth - 120);
+	  doc.setFont("helvetica", "bold");
+	  doc.setFontSize(11);
+	  doc.setTextColor(...accentColor);
+
+	  // total lebar kombinasi (gambar + jarak + teks)
+	  const textWidth = doc.getTextWidth(summaryWrap[0]);
+	  const totalWidth = iconWidth + 10 + textWidth;
+	  const startX = (pageWidth - totalWidth) / 2;
+	  const textY = boxY + (boxHeight / 2) + 1;
+
+	  // Tambahkan ikon di kiri teks
+	  if (iconBase64) {
+		doc.addImage(iconBase64, "PNG", startX, textY - iconHeight + 4, iconWidth, iconHeight);
+	  }
+
+	  // Tambahkan teks sejajar ikon
+	  doc.text(summaryWrap, startX + iconWidth + 10, textY, { baseline: "middle" });
+
+	  cursorY = boxY + boxHeight + 20; // jarak ke bawah
+	}
+
+
+    // ===== Fungsi bantu cetak judul tabel =====
+    function printTableTitleLeft(title, yPos) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(0, 0, 0);
+      doc.text(title.toUpperCase(), marginX, yPos);
+    }
+
+    // ===== LOOP TABEL =====
+    for (let t = 0; t < tables.length; t++) {
+      const { id, title } = tables[t];
+      const tableEl = document.getElementById(id);
+      if (!tableEl) continue;
+
+      const headers = Array.from(tableEl.querySelectorAll("thead th")).map(th => th.innerText.trim());
+      const rows = Array.from(tableEl.querySelectorAll("tbody tr")).map(tr =>
+        Array.from(tr.querySelectorAll("td")).map(td => td.innerText.trim())
+      );
+      if (!rows.length) continue;
+
+      // pindah halaman jika posisi mendekati bawah
+      if (cursorY + 40 > pageHeight - 60) {
+        doc.addPage();
+        cursorY = 40;
+      }
+
+      // cetak judul tabel rata kiri
+      printTableTitleLeft(title, cursorY + 12);
+      let startY = cursorY + 22;
+
+      const isRekapKelas = title.toLowerCase().includes("rekap prosentase kelas");
+
+      doc.autoTable({
+		  startY,
+		  head: [headers],
+		  body: rows,
+		  theme: "grid",
+		  styles: {
+			fontSize: 9,
+			cellPadding: 4,
+			halign: "center",
+			valign: "middle"
+		  },
+		  headStyles: { fillColor: [26, 115, 232], textColor: 255, fontStyle: "bold" },
+		  margin: { left: marginX, right: marginX },
+		  showHead: "everyPage",
+		  pageBreak: 'auto',
+		  rowPageBreak: 'avoid', // ✅ baris tidak akan pecah ke halaman berikutnya
+		  didParseCell: function (data) {
+			if (!isRekapKelas && data.section === "body" && data.column.index === 1) {
+			  data.cell.styles.halign = "left";
+			}
+		  }
+		});
+
+
+      const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY : startY + 10;
+      cursorY = finalY + 20;
+
+      if (cursorY > pageHeight - 80) {
+        doc.addPage();
+        cursorY = 40;
+      }
+    }
+
+    // ===== FOOTER =====
+    // ===== FOOTER (HANYA DI HALAMAN TERAKHIR) =====
+	const footerText = `Admin – Simponi Kharisma – ${new Date().toLocaleString("id-ID")}`;
+	const totalPages = doc.getNumberOfPages();
+	doc.setPage(totalPages);
+	doc.setFont("helvetica", "italic");
+	doc.setFontSize(9);
+	doc.setTextColor(120);
+	doc.text(footerText, pageWidth - marginX, pageHeight - 30, { align: "right" });
+
+
+    // ===== Simpan PDF =====
+    doc.save(`Laporan_Sorogan_${new Date().toISOString().slice(0, 10)}.pdf`);
+
+    if (btn) {
+      btn.classList.remove('downloading');
+      btn.classList.add('complete');
+      setTimeout(() => btn.classList.remove('complete'), 700);
+      btn.removeAttribute('aria-disabled');
+    }
+
+  } catch (err) {
+    console.error("Error downloadPDFAll:", err);
+    if (btn) {
+      btn.classList.remove('downloading');
+      btn.removeAttribute('aria-disabled');
+    }
+    alert("Gagal membuat PDF: " + (err.message || err));
+  }
+}
+
+// --- pasang event listener untuk tombol Download Semua Laporan ---
+const btnDownloadAll = document.getElementById('btnDownloadAll');
+if (btnDownloadAll) {
+  btnDownloadAll.addEventListener('click', (e) => {
+    // opsional: mencegah double-click
+    if (btnDownloadAll.classList.contains('downloading')) return;
+    downloadPDFAll();
+  });
+}
+
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
@@ -1095,3 +1767,4 @@ if ("serviceWorker" in navigator) {
       .catch((err) => console.log("❌ SW registration failed:", err));
   });
 }
+

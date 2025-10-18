@@ -888,6 +888,9 @@ td.lafadz-col {
 }
 
 /* === Sembunyikan tombol hapus sementara === */
+
+
+
 .btn-delete {
   display: none !important;
 }
@@ -955,8 +958,7 @@ td.lafadz-col {
   padding: 10px 12px;
 }
 
-td.lafadz-colkitab {
-  font-size: 1.2em;
+td.lafadz-colkitab { 
   min-width: 130px;
   max-width: 230px;
 }
@@ -1059,10 +1061,320 @@ select.arabic option {
   }
 }
 
+.laporan-container h4 {
+  margin-top: 20px;
+  color: #1a237e;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 5px;
+}
+
+.laporan-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.laporan-table th, .laporan-table td {
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.laporan-table th {
+  background-color: #e8eaf6;
+  font-weight: bold;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+.tab-btn.active {
+  background-color: #1a73e8;
+  color: white;
+}
+
+.summary-box {
+  background: #f5f9ff;
+  border-left: 5px solid #1a73e8;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin: 10px 0 20px 0;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+.checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.check-item {
+  background: #f2f2f2;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.radio-group label {
+  cursor: pointer;
+}
+
+/* ========== COLLAPSIBLE CHECKLIST ========== */
+.checklist-wrapper {
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e6eefc;
+  margin-bottom: 6px;
+}
+
+.checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checklist-title {
+  font-weight: 600;
+  color: #0d47a1;
+  font-size: 0.98rem;
+}
+
+.checklist-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.triangle {
+  width: 12px;
+  height: 12px;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><path d='M1 3l4 4 4-4z'/></svg>") no-repeat center / contain;
+  background-color: #1a73e8;
+  transform-origin: 50% 50%;
+  transition: transform 0.2s ease;
+}
+
+.triangle.open {
+  transform: rotate(180deg);
+}
+
+.checklist-body {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+  overflow: hidden;
+}
+
+.checklist-body.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.checklist-body.expanded {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.check-item {
+  background: #f8fbff;
+  color: #0b3b86;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checklist-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, #e0e7ff 50%, transparent 95%);
+  margin: 6px 0;
+  opacity: 0.9;
+}
+
+/* tabel biru */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+table thead th {
+  background: linear-gradient(180deg, #1a73e8 0%, #1565c0 100%);
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px 10px;
+  border: 1px solid #0d47a1;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* isi tabel rata kiri kecuali header */
+table tbody td {
+  border: 1px solid #dbe3f0;
+  padding: 6px 10px;
+  text-align: left; /* ✅ ubah ke kiri */
+  vertical-align: middle;
+}
+
+/* kolom angka tetap tengah */
+td:nth-child(3),
+td:nth-child(4),
+td:nth-child(5),
+td:nth-child(6),
+td:nth-child(7) {
+  text-align: center;
+}
+
+/* === KHUSUS TABEL REKAP KELAS === */
+#tblKelas tbody td {
+  text-align: center; /* hanya tabel ini yang rata kiri */
+}
+
+/* Supaya header rekap kelas tetap tengah */
+#tblKelas thead th {
+  text-align: center;
+}
+
+table tbody tr:nth-child(even) {
+  background: #f9fbff;
+}
+
+table tbody tr:hover {
+  background: #e9f2ff;
+}
+
+.status-checkbox {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.status-checkbox label {
+  font-weight: 500;
+  color: #333;
+}
+
+.status-checkbox input[type="radio"] {
+  margin-right: 6px;
+  transform: scale(1.2);
+}
 
 
 
+/* responsive: kecilkan font di ponsel */
+@media (max-width: 480px) {
+  .checklist-title { font-size: 0.95rem; }
+  .check-item { font-size: 0.9rem; padding: 6px 8px; }
+}
 
 
 
+/* ========== Summary box (web) ========== */
+/* sudah ada #laporanSummary — ini memperhalus tampilannya */
+#laporanSummary {
+  background: #ffffff;               /* putih agar teks biru jelas */
+  color: #1a73e8;                    /* teks biru sesuai tema */
+  border: 1px solid rgba(26,115,232,0.12);
+  box-shadow: 0 6px 16px rgba(26,115,232,0.06);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin: 12px 0;
+  font-weight: 600;
+  font-size: 0.98rem;
+  display: inline-block;
+  max-width: 100%;
+}
 
+/* Wrap teks jika panjang (pada PDF kita juga membungkus via js) */
+#laporanSummary { white-space: normal; word-break: break-word; }
+
+/* ========== Download button animated state ========== */
+.btn-download-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+/* small icon inside button */
+.btn-download-all .btn-icon {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  transition: transform .25s ease;
+}
+
+/* spinner (hidden by default) */
+.btn-download-all .btn-spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.22);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.8s linear infinite;
+}
+
+/* When downloading: show spinner, push icon a bit and animate */
+.btn-download-all.downloading {
+  pointer-events: none;
+  filter: brightness(.98);
+  transform: translateY(-1px);
+}
+
+.btn-download-all.downloading .btn-spinner {
+  display: inline-block;
+}
+
+.btn-download-all.downloading .btn-icon {
+  transform: translateX(-6px) rotate(-8deg);
+  transition: transform .35s cubic-bezier(.2,.9,.3,1);
+}
+
+/* subtle pulsing glint */
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* small animation after download finished */
+.btn-download-all.complete {
+  animation: btn-complete 0.6s ease;
+  background: linear-gradient(90deg, #1a73e8, #1565c0);
+}
+@keyframes btn-complete {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}

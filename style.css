@@ -1378,3 +1378,69 @@ table tbody tr:hover {
   50% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
+
+/* ==========================
+   MOBILE FIX: Checklist laporan terlihat di HP
+========================== */
+@media (max-width: 768px) {
+  .checklist-wrapper {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .checklist-body {
+    max-height: 250px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #d0d7e2;
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  .checklist label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    padding: 6px 0;
+  }
+
+  .checklist input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .checklist-header {
+    padding: 10px;
+    background: #f0f5ff;
+    border-radius: 8px;
+    margin-bottom: 5px;
+  }
+}
+/* ==========================
+   Samakan lebar tabel laporan dengan tabel utama
+========================== */
+.laporan-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #1a73e8;
+  min-width: 950px; /* samakan dengan tabel utama */
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.laporan-table th,
+.laporan-table td {
+  border: 1px solid #1a73e8;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.laporan-table th {
+  background: #d9e8ff;
+  color: #0d2b5e;
+}
+
+.laporan-container {
+  overflow-x: auto; /* supaya tabel tidak terpotong di HP */
+}

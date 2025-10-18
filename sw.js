@@ -1,10 +1,10 @@
 // ===============================================
-// Service Worker - Khudama' Kharisma (Auto Version)
+// Service Worker - Khudama' Kharisma (Smart Cache Version)
 // ===============================================
 
-// 🕒 Versi otomatis berdasarkan tanggal build
-const today = new Date();
-const VERSION = `v${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}`;
+// 💡 Versi cache otomatis berdasarkan waktu build (bukan tanggal harian)
+const BUILD_TIME = self.BUILD_TIME || Date.now(); // bisa diganti otomatis saat build
+const VERSION = `v${BUILD_TIME}`;
 const CACHE_NAME = `kharisma-cache-${VERSION}`;
 
 const FILES_TO_CACHE = [
@@ -17,6 +17,7 @@ const FILES_TO_CACHE = [
   "/icons/logo.png"
 ];
 
+// ===================== INSTALL =====================
 self.addEventListener("install", (event) => {
   console.log(`[SW] Installing ${CACHE_NAME}...`);
   event.waitUntil(
@@ -25,6 +26,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
+// ===================== ACTIVATE =====================
 self.addEventListener("activate", (event) => {
   console.log("[SW] Activating new service worker...");
   event.waitUntil(
@@ -42,11 +44,12 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// ===================== FETCH =====================
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // 🚫 Jangan cache Supabase (biar data real-time)
+  // 🚫 Jangan cache request ke Supabase (agar data tetap real-time)
   if (url.origin.includes("supabase.co")) return;
 
   event.respondWith(
@@ -61,12 +64,14 @@ self.addEventListener("fetch", (event) => {
           return res;
         })
         .catch(() => {
+          // fallback ke halaman utama kalau offline
           if (req.mode === "navigate") return caches.match("/index.html");
         });
     })
   );
 });
 
+// ===================== PESAN DARI CLIENT =====================
 // 🧠 Auto-activate tanpa reload manual
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {

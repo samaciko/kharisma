@@ -891,9 +891,6 @@ td.lafadz-col {
 
 
 
-.btn-delete {
-  display: none !important;
-}
 
 /* ==========================
    KOLOM LAFADZ NADHOM - 2 BARIS DENGAN GARIS
@@ -1052,12 +1049,12 @@ select.arabic option {
 @media screen and (max-width: 768px) and (pointer: coarse) {
   select,
   select option {
-    font-size: 12px !important;
+    font-size: 9px !important;
   }
 
   select.arabic,
   select.arabic option {
-    font-size: 0.95em !important;
+    font-size: 0.85em !important;
   }
 }
 
@@ -1077,7 +1074,7 @@ select.arabic option {
 .laporan-table th, .laporan-table td {
   border: 1px solid #ccc;
   padding: 6px 10px;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .laporan-table th {
@@ -1174,14 +1171,7 @@ select.arabic option {
   transform: rotate(180deg);
 }
 
-.checklist-body {
-  margin-top: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  transition: max-height 0.25s ease, opacity 0.2s ease;
-  overflow: hidden;
-}
+
 
 .checklist-body.collapsed {
   max-height: 0;
@@ -1424,7 +1414,7 @@ table tbody tr:hover {
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #1a73e8;
-  min-width: 950px; /* samakan dengan tabel utama */
+  min-width: auto; /* samakan dengan tabel utama */
   background: #fff;
   font-size: 0.95rem;
 }
@@ -1444,3 +1434,527 @@ table tbody tr:hover {
   overflow-x: auto; /* supaya tabel tidak terpotong di HP */
 }
 
+/* ==========================
+   FONT & STYLING UNTUK CHECKLIST LAPORAN
+========================== */
+
+/* Checklist wrapper */
+.checklist-wrapper {
+  margin-bottom: 8px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Checklist header */
+.checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+.checklist-title {
+  font-weight: 700;
+  color: #1e40af;
+  font-size: 1rem !important; /* Ukuran font header */
+  letter-spacing: -0.01em;
+  font-family: "Poppins", sans-serif !important;
+}
+
+/* Checklist body */
+
+
+/* Check item individual */
+.check-item {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem !important; /* Ukuran font item */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif !important;
+  line-height: 1.4;
+}
+
+/* Checkbox styling */
+.check-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #1e40af;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Label checkbox */
+.check-item label {
+  font-size: 0.9rem !important;
+  font-weight: 500;
+  color: #0369a1;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif !important;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Radio group styling */
+.radio-group {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif;
+}
+
+.radio-group label {
+  font-size: 0.9rem !important;
+  color: #374151;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.radio-group input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #1e40af;
+}
+
+/* Status checkbox khusus */
+.status-checkbox {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.status-checkbox label {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem !important;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.status-checkbox input[type="radio"] {
+  margin-right: 6px;
+  transform: scale(1.1);
+}
+
+/* Mobile optimization untuk checklist */
+@media (max-width: 768px) {
+  .checklist-header {
+    padding: 14px 16px;
+  }
+  
+  .checklist-title {
+    font-size: 0.95rem !important;
+  }
+  
+  .checklist-body {
+    padding: 14px 16px;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .check-item {
+    font-size: 0.85rem !important;
+    padding: 8px 12px;
+    flex: 1 1 calc(50% - 8px);
+    min-width: 140px;
+  }
+  
+  .check-item label {
+    font-size: 0.85rem !important;
+  }
+  
+  .radio-group {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .radio-group label {
+    font-size: 0.85rem !important;
+  }
+  
+  .status-checkbox {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .status-checkbox label {
+    font-size: 0.85rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .checklist-title {
+    font-size: 0.9rem !important;
+  }
+  
+  .check-item {
+    font-size: 0.8rem !important;
+    flex: 1 1 100%;
+    padding: 8px 10px;
+  }
+  
+  .check-item label {
+    font-size: 0.8rem !important;
+  }
+  
+  .radio-group label {
+    font-size: 0.8rem !important;
+  }
+  
+  .status-checkbox label {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Hover effects */
+.checklist-header:hover {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+}
+
+.check-item:hover {
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.2);
+}
+
+/* Focus states untuk aksesibilitas */
+.check-item input[type="checkbox"]:focus,
+.radio-group input[type="radio"]:focus {
+  outline: 2px solid #1e40af;
+  outline-offset: 2px;
+}
+
+/* ==========================
+   CHECKLIST HEADER - COMPACT SIZE
+========================== */
+
+/* Checklist wrapper yang lebih compact */
+.checklist-wrapper {
+  margin-bottom: 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Checklist header yang lebih kecil */
+.checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px !important; /* Diperkecil */
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  min-height: 44px; /* Touch friendly tapi compact */
+}
+
+/* Judul checklist yang lebih kecil */
+.checklist-title {
+  font-weight: 600;
+  color: #1e40af;
+  font-size: 0.85rem !important; /* Diperkecil dari 1rem */
+  letter-spacing: -0.01em;
+  font-family: "Poppins", sans-serif !important;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Triangle toggle yang lebih kecil */
+.triangle {
+  width: 10px !important;
+  height: 10px !important;
+  background: #1e40af;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.triangle.open {
+  transform: rotate(180deg);
+}
+
+/* Checklist body yang compact */
+.checklist-body {
+  padding: 12px 14px !important; /* Diperkecil */
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Check item yang lebih compact */
+.check-item {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  padding: 6px 10px !important; /* Diperkecil */
+  border-radius: 8px;
+  font-size: 0.8rem !important; /* Diperkecil */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif !important;
+  line-height: 1.3;
+  min-height: 32px; /* Tetap touch friendly */
+}
+
+/* Checkbox yang lebih kecil */
+.check-item input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  accent-color: #1e40af;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Label checkbox yang lebih kecil */
+.check-item label {
+  font-size: 0.8rem !important; /* Diperkecil */
+  font-weight: 500;
+  color: #0369a1;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif !important;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Mobile optimization untuk checklist compact */
+@media (max-width: 768px) {
+  .checklist-wrapper {
+    margin-bottom: 12px;
+    border-radius: 8px;
+  }
+  
+  .checklist-header {
+    padding: 8px 12px !important;
+    min-height: 40px;
+  }
+  
+  .checklist-title {
+    font-size: 0.8rem !important;
+  }
+  
+  .checklist-body {
+    padding: 10px 12px !important;
+    gap: 6px;
+    max-height: 180px;
+  }
+  
+  .check-item {
+    font-size: 0.75rem !important;
+    padding: 5px 8px !important;
+    flex: 1 1 calc(50% - 6px);
+    min-width: 120px;
+    min-height: 30px;
+  }
+  
+  .check-item label {
+    font-size: 0.75rem !important;
+  }
+  
+  .triangle {
+    width: 8px !important;
+    height: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .checklist-header {
+    padding: 6px 10px !important;
+    min-height: 36px;
+  }
+  
+  .checklist-title {
+    font-size: 0.75rem !important;
+  }
+  
+  .checklist-body {
+    padding: 8px 10px !important;
+  }
+  
+  .check-item {
+    font-size: 0.7rem !important;
+    padding: 4px 6px !important;
+    flex: 1 1 100%;
+    min-height: 28px;
+  }
+  
+  .check-item label {
+    font-size: 0.7rem !important;
+  }
+  
+  .check-item input[type="checkbox"] {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+/* Hover effects untuk compact version */
+.checklist-header:hover {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  transform: translateY(-1px);
+}
+
+.check-item:hover {
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+  transform: translateY(-1px);
+}
+
+/* =================== CEKLIST RAMPING =================== */
+.checklist-wrapper {
+  padding: 10px 14px !important; /* lebih rapat */
+}
+
+.checklist-header {
+  padding: 6px 0 !important; /* tinggi header lebih pendek */
+  min-height: 32px;
+}
+
+.check-item {
+  padding: 3px 0 !important; /* jarak antar item dipersempit */
+  font-size: 0.9rem;
+}
+
+.radio-group,
+.status-checkbox {
+  gap: 6px !important; /* jarak antar tombol lebih rapat */
+  margin-top: 6px !important;
+}
+
+.radio-group label,
+.status-checkbox label {
+  padding: 3px 8px !important; /* tombol radio/checkbox lebih kecil */
+  font-size: 0.85rem !important;
+}
+
+/* =====================================================
+   TOGGLE CHECKLIST: KELAS / UNIT / KITAB (FINAL - SEGITIGA BIRU)
+   ===================================================== */
+.checklist-wrapper {
+  margin-bottom: 6px !important;
+  padding: 6px 10px !important;
+  border-radius: 10px;
+}
+
+/* Header toggle */
+.checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f7f9fc;
+  padding: 6px 10px !important;
+  border-radius: 8px;
+  cursor: pointer;
+  min-height: 36px !important;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #222;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.checklist-header:hover {
+  background: #e8f0fe; /* sedikit biru saat hover */
+  color: #0b57d0;
+}
+
+/* === Segitiga toggle warna biru === */
+.checklist-header .triangle {
+  width: 0;
+  height: 0;
+  margin-right: 8px;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 9px solid #0b57d0; /* biru Google style */
+  transition: transform 0.25s ease, border-top-color 0.25s ease;
+  transform-origin: center;
+}
+
+.checklist-header .triangle.open {
+  transform: rotate(180deg);
+  border-top-color: #1a73e8; /* biru lebih terang saat terbuka */
+}
+
+/* Isi checklist */
+.checklist-body {
+  padding: 6px 10px !important;
+  background: #fff;
+  border-left: 2px solid #e4e6eb;
+  border-right: 2px solid #e4e6eb;
+  border-bottom: 2px solid #e4e6eb;
+  border-radius: 0 0 8px 8px;
+  overflow-y: auto;
+  transition: max-height 0.25s ease, opacity 0.25s ease;
+  opacity: 1;
+}
+
+/* Saat tertutup */
+.checklist-body.collapsed {
+  max-height: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  overflow: hidden;
+  opacity: 0;
+}
+
+/* Saat terbuka */
+.checklist-body.expanded {
+  max-height: 300px;
+  opacity: 1;
+}
+
+/* Item dalam checklist */
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px !important;
+  font-size: 0.9rem;
+  min-height: 28px !important;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.check-item:hover {
+  background: #f3f6fb;
+}
+
+/* Responsif untuk HP */
+@media (max-width: 768px) {
+  .checklist-header {
+    padding: 8px 12px !important;
+    min-height: 40px !important;
+  }
+  .checklist-header .triangle {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid #0b57d0;
+  }
+  .check-item {
+    min-height: 32px !important;
+    padding: 6px 8px !important;
+  }
+}

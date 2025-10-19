@@ -1958,3 +1958,7 @@ table tbody tr:hover {
     padding: 6px 8px !important;
   }
 }
+
+.btn-delete {
+  display: none !important;
+}
